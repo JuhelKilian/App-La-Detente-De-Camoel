@@ -5,6 +5,7 @@ import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import '../../../utils/chatFonctions.dart';
+import 'ConfirmationSuppression.dart';
 
 class ChatPage extends StatefulWidget {
   @override
@@ -23,6 +24,20 @@ class _ChatPageState extends State<ChatPage> {
     super.initState();
     _loadMessages();
   }
+
+  void _supprimeDernierMessage() async {
+    final bool? confirmed = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(builder: (context) => const ConfirmationSuppression()),
+    );
+
+    if (confirmed == true && _messages.isNotEmpty) {
+      setState(() {
+        _messages.removeAt(0);  // Suppression du dernier message (index 0 car liste inversée)
+      });
+      _saveMessages();
+    }
+  }
+
 
   void _loadMessages() async {
     List<dynamic> messages = await recupererMessagesDepuisApi(1, 1); // Replace with actual idChat and offset
@@ -78,6 +93,8 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -87,6 +104,10 @@ class _ChatPageState extends State<ChatPage> {
           IconButton(
             icon: Icon(Icons.refresh),
             onPressed: _fetchMessagesFromApi,
+          ),
+          IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: _supprimeDernierMessage,
           ),
         ],
       ),
