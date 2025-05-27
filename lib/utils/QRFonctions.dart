@@ -153,3 +153,45 @@ Future<void> validerQR(Map<String, dynamic> Reservation) async {
 
 }
 
+Future<Map<String, dynamic>> reporterReservation(int idReservation, String date, String heure) async {
+  var headers = {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+  };
+
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('auth_token');
+
+  if (token == null) {
+    return {'error': 'unauthenticated'};
+  }
+
+  headers['Authorization'] = 'Bearer $token';
+
+  String url = '${AppConfig.baseUrl}/reservation/reporter/$idReservation';
+
+  // On envoie date et heure dans le corps JSON
+  final body = jsonEncode({
+    'date': date,
+    'heure': heure,
+  });
+
+  var request = http.Request('POST', Uri.parse(url));
+  request.body = body;
+  request.headers.addAll(headers);
+
+  try {
+    http.StreamedResponse response = await request.send();
+
+    String responseData = await response.stream.bytesToString();
+
+    if (response.statusCode == 200) {
+      return jsonDecode(responseData);
+    } else {
+      var message = jsonDecode(responseData);
+      return {'error': message['message'] ?? 'Erreur serveur'};
+    }
+  } catch (e) {
+    return {'error': 'Erreur de connexion: $e'};
+  }
+}

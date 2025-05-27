@@ -20,6 +20,23 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
   bool isFlashOn = false;
   bool isError = false;
   String errorMessage = '';
+  /*
+  code modifié pour auutoriser sans téléphone à scanner un code "dsiqqsdsfsxsfdo"
+  */
+
+  bool _hasAutoValidated = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!_hasAutoValidated) {
+        _hasAutoValidated = true;
+        await _validateQRCode("dsiqqsdsfsxsfdo");
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

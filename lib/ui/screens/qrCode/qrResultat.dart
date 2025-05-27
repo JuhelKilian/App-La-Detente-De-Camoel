@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'changerReservation.dart';
 import 'changerTable.dart';
 import 'package:android_detente_camoel/utils/QRFonctions.dart';
 import 'package:android_detente_camoel/ui/screens/HomePageScreen.dart';
@@ -152,7 +153,25 @@ class _QRResultatState extends State<QRResultat> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 12.0),
+                  ElevatedButton(
+                    onPressed: () async {
+                      final result = await Navigator.push<Map<String, dynamic>>(
+                        context,
+                        MaterialPageRoute(builder: (context) => changerReservation(idReservation: int.parse(currentContent['id_reservation']))),
+                      );
+
+                      if (result != null && result.containsKey('date') && result.containsKey('heure')) {
+                        setState(() {
+                          currentContent['date'] = result['date'];
+                          currentContent['heure'] = result['heure'];
+                        });
+                      }
+                    },
+                    child: const Text('Reporter la réservation'),
+                  ),
+
+                  const SizedBox(height: 24.0),
 
                   const Text(
                     'Critères choisis en cas de table prise :',
